@@ -1,0 +1,1 @@
+C:\Users\Gabriel\Documents\VsCode\Python\SD\sensor-sistemas-distribuidos\sensordeaproximidade\build\app\intermediates\cxx\Debug\222n35i1\obj\x86
