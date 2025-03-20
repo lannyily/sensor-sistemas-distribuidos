@@ -115,7 +115,7 @@ python server.py
 
 O aplicativo possui uma tela inicial com um botão para ativar e desativar o sensor de proximidade. Quando ativado, o sensor detecta movimento e captura uma foto automaticamente. Esse processo ocorre de forma independente, sem necessidade de conexão com o servidor.
 
-<img src="tela_inicial.jpg" alt="Tela Inicial" width="400">
+<img src="tela_inicial.jpg" alt="Tela Inicial" width="300">
 
 Na parte superior do aplicativo, há um botão para estabelecer conexão com o servidor, caso ainda não esteja conectada. A foto capturada só é enviada ao servidor se a conexão estiver ativa.
 
@@ -132,7 +132,7 @@ As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos"
 <img src="foto_armazenada_servidor.png" alt="Foto Salvo" width="300">
 <img src="servidor_fotos.jpg" alt="Servidor Fotos" width="300">
 
-# Estrutura do Projeto
+# 🗂️ Estrutura do Projeto
 
 ## sensor-sistemas-distribuidos/
 
@@ -157,7 +157,7 @@ As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos"
 ├── README.md # Documentação do projeto  
 ```
 
-## Principais Módulos  
+## 🧩 Principais Módulos  
 
 ### Aplicativo Flutter (`sensordeaproximidade/`)  
 - **`lib/`**: Contém o código fonte do aplicativo.  
