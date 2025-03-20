@@ -40,3 +40,18 @@ Este projeto é um plicativo Android que utilize o sensor de proximidade para at
 - Sockets (dart:io) – Comunicação com um servidor via TCP.
 - Timers (dart:async) – Execução de tarefas periódicas.
 - JSON (dart:convert) – Codificação e decodificação de dados em JSON.
+
+## 📌 Guia de Instalação e Uso
+
+### 1️⃣ Instalar Python 3.11.6
+
+O Python 3.11.6 foi escolhido porque versões mais novas do Python (como 3.13) podem ter incompatibilidade com PyQt5, devido a mudanças internas na API do Python. Algumas versões mais antigas do PyQt5 podem não funcionar corretamente no Python 3.13, exigindo um downgrade para Python 3.11.6.
+
+🔹 Baixe e instale o Python 3.11.6 em:
+[Download Python 3.11.6](https://www.python.org/downloads/release/python-3116/)
+
+### 2️⃣ Instalar as Bibliotecas
+
+```sh
+pip install -r requirements.txt
+```
