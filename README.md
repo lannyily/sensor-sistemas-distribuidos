@@ -52,6 +52,8 @@ O Python 3.11.6 foi escolhido porque versões mais novas do Python (como 3.13) p
 
 ### 2️⃣ Instalar as Bibliotecas
 
+Para rodar o sistema, instale as dependências com:
+
 ```sh
 pip install -r requirements.txt
 ```
