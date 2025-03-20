@@ -93,6 +93,24 @@ final List<String> possibleIps = [
 
 💡 **Dica:** Se estiver testando no **emulador Android**, use `"10.0.2.2"` para acessar o localhost do seu PC.  
 
+### 6️⃣ Executar o Servidor  
+
+Antes de rodar o código, é importante abrir a pasta do servidor como raiz no terminal.  
+
+1️⃣ Acesse o diretório do servidor:  
+
+```sh
+cd caminho/para/a/pasta/do/servidor
+```  
+
+2️⃣ Agora, execute o servidor com:  
+
+```sh
+python server.py
+```  
+
+💡 **Observação:** Certifique-se de estar na pasta correta antes de rodar o comando, pois ele depende dos arquivos e diretórios dentro da pasta do servidor. 
+
 ## 🛠️ Funcionamento
 
 O aplicativo possui uma tela inicial com um botão para ativar e desativar o sensor de proximidade. Quando ativado, o sensor detecta movimento e captura uma foto automaticamente. Esse processo ocorre de forma independente, sem necessidade de conexão com o servidor.
