@@ -115,11 +115,11 @@ python server.py
 
 O aplicativo possui uma tela inicial com um botão para ativar e desativar o sensor de proximidade. Quando ativado, o sensor detecta movimento e captura uma foto automaticamente. Esse processo ocorre de forma independente, sem necessidade de conexão com o servidor.
 
-![Tela Inicia](tela_inicial.jpg)
+<img src="tela_inicial.jpg" alt="Tela Inicial" width="400">
 
 Na parte superior do aplicativo, há um botão para estabelecer conexão com o servidor, caso ainda não esteja conectada. A foto capturada só é enviada ao servidor se a conexão estiver ativa.
 
-![Botão Reconectar](botão_reconectar.jpg)
+<img src="botão_reconectar.jpg" alt="Botão Reconectar" width="300">
 
 Quando o servidor detecta movimento, ele ativa um alarme, que só pode ser desligado manualmente na interface do servidor. Essa interface contém:
 
@@ -129,13 +129,14 @@ Quando o servidor detecta movimento, ele ativa um alarme, que só pode ser desli
 
 As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos" do servidor.
 
-![Foto Salvo](foto_armazenada_servidor.png)
-![Servidor Fotos](servidor_fotos.jpg)
+<img src="foto_armazenada_servidor.png" alt="Foto Salvo" width="300">
+<img src="servidor_fotos.jpg" alt="Servidor Fotos" width="300">
 
 # Estrutura do Projeto
 
 ## sensor-sistemas-distribuidos/
 
+```sh
 ├── sensordeaproximidade/ # Diretório do aplicativo Flutter  
 │   ├── lib/ # Código fonte do aplicativo  
 │   │   ├── main.dart # Ponto de entrada do aplicativo  
@@ -150,12 +151,11 @@ As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos"
 │  
 ├── servidor/ # Diretório do servidor Python  
 │   ├── server.py # Código principal do servidor  
-│   ├── requirements.txt # Dependências do servidor  
-│   ├── audio/ # Arquivos de áudio (ex: alarme)  
-│   ├── fotos/ # Diretório para armazenar fotos recebidas  
-│   └── ... # Outros arquivos do servidor  
-│  
+│   ├── audio/ # Arquivos de áudio (alarme)  
+│   └── fotos/ # Diretório para armazenar fotos recebidas   
+├── requirements.txt # Dependências do servidor 
 ├── README.md # Documentação do projeto  
+```
 
 ## Principais Módulos  
 
