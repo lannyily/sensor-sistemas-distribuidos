@@ -14,7 +14,7 @@ Este projeto é um plicativo Android que utilize o sensor de proximidade para at
 
 ### Pacotes e Bibliotecas Utilizadas
 
-Aplicativo: 
+**Aplicativo:** 
 
 - proximity_sensor – Para detectar proximidade do dispositivo.
 - camera – Para acessar a câmera do dispositivo.
@@ -24,7 +24,7 @@ Aplicativo:
 - crypto – Para criptografia e hashing de dados (MD5, SHA-256, etc.).
 - flutter/services.dart – Para comunicação com serviços nativos do sistema operacional.
 
-  Servidor:
+**Servidor:**
 
 - socket: Para comunicação via TCP/IP entre cliente e servidor.
 - pygame: Para reprodução de áudio do alarme.
