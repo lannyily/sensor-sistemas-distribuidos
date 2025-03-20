@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'package:crypto/crypto.dart';
 
 void main() async {
   // Garante que o Flutter binding seja inicializado
@@ -42,12 +43,12 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _connectToServer(); // Inicia a conexão com o servidor
     _requestPermissions();
-    
+
     // Após conectar, solicita a lista de fotos armazenadas
     Future.delayed(Duration(seconds: 2), () {
       _requestStoredPhotosList();
     });
-    
+
     // Configura um timer para tentar reconectar ao servidor periodicamente
     // se a conexão for perdida
     Timer.periodic(Duration(seconds: 30), (timer) {
@@ -66,18 +67,18 @@ class _MyAppState extends State<MyApp> {
   Future<void> _requestPermissions() async {
     // Evita solicitações simultâneas
     if (_isRequestingPermission) return;
-    
+
     setState(() {
       _isRequestingPermission = true;
     });
-    
+
     try {
       // Verifica o status atual das permissões
       final cameraStatus = await Permission.camera.status;
-      
+
       // Verificamos apenas a permissão da câmera, já que não precisamos mais da permissão
       // de armazenamento específica para salvar no diretório de aplicativos
-      
+
       // Se a câmera já está concedida, não precisa solicitar novamente
       if (cameraStatus.isGranted) {
         setState(() {
@@ -86,10 +87,10 @@ class _MyAppState extends State<MyApp> {
         await _initializeCamera();
         return;
       }
-      
+
       // Solicita apenas a permissão da câmera
       final cameraPermission = await Permission.camera.request();
-      
+
       final permissionGranted = cameraPermission.isGranted;
 
       print("Status permissão câmera: $cameraPermission");
@@ -154,184 +155,145 @@ class _MyAppState extends State<MyApp> {
     try {
       // Captura a foto silenciosamente
       final image = await _cameraController!.takePicture();
-      
+
       // Usamos o diretório de aplicativos que não requer permissão especial
       final directory = await getApplicationDocumentsDirectory();
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       final savedPath = path.join(directory.path, fileName);
-      
+
       await image.saveTo(savedPath);
       setState(() {
         _lastPhotoPath = savedPath;
       });
-      
+
       print('Foto capturada discretamente e salva em: $savedPath');
-      
+
       // Enviar a foto para o servidor
       await _sendPhotoToServer(savedPath, fileName);
     } catch (e) {
       print('Erro ao tirar foto: $e');
     }
   }
-  
+
   // Função para enviar a foto para o servidor
-  Future<void> _sendPhotoToServer(String filePath, String fileName) async {
+  Future<void> _sendPhotoToServer(savedPath, fileName) async {
     int tentativas = 0;
     const maxTentativas = 3;
-    
-    // Loop de tentativas para enviar a foto
-    while (tentativas < maxTentativas) {
-      tentativas++;
-      
-      try {
-        // Verificar se o arquivo existe
-        File imageFile = File(filePath);
-        if (!await imageFile.exists()) {
-          print('❌ Arquivo de imagem não encontrado: $filePath');
-          setState(() {
-            _lastTransmissionStatus = "Erro: Arquivo de imagem não encontrado";
-          });
-          return;
-        }
-        
-        // Verificar se o servidor está conectado
-        if (_socket == null) {
-          print('⚠️ Servidor não conectado. Tentando reconectar... (Tentativa $tentativas de $maxTentativas)');
-          bool connected = await _connectToServer();
-          
-          if (!connected || _socket == null) {
-            if (tentativas >= maxTentativas) {
-              print('❌ Não foi possível conectar ao servidor para enviar a foto.');
-              setState(() {
-                _lastTransmissionStatus = "Erro: Não foi possível conectar ao servidor";
-              });
-              return;
+
+    try {
+      // 📸 Capturar imagem da câmera
+      XFile image = await _cameraController!.takePicture();
+      print("Imagem capturada: ${image.path}");
+
+      File file = File(image.path);
+      if (!await file.exists()) {
+        print('❌ Erro: Arquivo de imagem não encontrado!');
+        setState(() {
+          _lastTransmissionStatus = "Erro: Arquivo de imagem não encontrado";
+        });
+        return;
+      }
+
+      List<int> imageBytes = await file.readAsBytes();
+      if (imageBytes.isEmpty) {
+        print('❌ Erro: Arquivo de imagem vazio!');
+        setState(() {
+          _lastTransmissionStatus = "Erro: Arquivo de imagem vazio";
+        });
+        return;
+      }
+
+      String base64Image = base64Encode(imageBytes);
+      String md5Hash = md5.convert(imageBytes).toString();
+      print('🛠 MD5 antes do envio: $md5Hash');
+      print('📏 Tamanho da imagem em Base64: ${base64Image.length} bytes');
+
+      while (tentativas < maxTentativas) {
+        tentativas++;
+
+        try {
+          if (_socket == null) {
+            print('⚠️ Servidor não conectado. Tentando reconectar... (Tentativa $tentativas de $maxTentativas)');
+            bool connected = await _connectToServer();
+
+            if (!connected || _socket == null) {
+              if (tentativas >= maxTentativas) {
+                print('❌ Não foi possível conectar ao servidor para enviar a foto.');
+                setState(() {
+                  _lastTransmissionStatus = "Erro: Não foi possível conectar ao servidor";
+                });
+                return;
+              }
+              await Future.delayed(Duration(seconds: 2));
+              continue;
             }
-            // Aguarda antes de tentar novamente
-            await Future.delayed(Duration(seconds: 2));
-            continue; // Tenta novamente
           }
-        }
-        
-        // Ler o arquivo como bytes
-        List<int> imageBytes;
-        try {
-          imageBytes = await imageFile.readAsBytes();
-          if (imageBytes.isEmpty) {
-            print('❌ Arquivo de imagem vazio: $filePath');
-            setState(() {
-              _lastTransmissionStatus = "Erro: Arquivo de imagem vazio";
-            });
-            return;
-          }
-          print('📊 Lidos ${imageBytes.length} bytes da imagem');
-        } catch (e) {
-          print('❌ Erro ao ler bytes da imagem: $e');
-          setState(() {
-            _lastTransmissionStatus = "Erro ao ler imagem: $e";
-          });
-          return;
-        }
-        
-        try {
+
           setState(() {
             _lastTransmissionStatus = "Enviando foto para o servidor...";
           });
-          
-          // Parte 1: Comandos iniciais
-          _socket!.write("STORE_PHOTO\n");
-          await Future.delayed(Duration(milliseconds: 100)); // Pequena pausa
-          
-          _socket!.write("FILENAME:$fileName\n");
-          await Future.delayed(Duration(milliseconds: 100));
-          
-          DateTime now = DateTime.now();
-          String timestamp = now.toIso8601String();
-          _socket!.write("TIMESTAMP:$timestamp\n");
-          await Future.delayed(Duration(milliseconds: 100));
-          
-          _socket!.write("SIZE:${imageBytes.length}\n");
-          await Future.delayed(Duration(milliseconds: 100));
-          
-          _socket!.write("BEGIN_DATA\n");
-          await Future.delayed(Duration(milliseconds: 100));
-          
-          // Parte 2: Envio dos dados da imagem em blocos menores
-          const int blockSize = 1024; // Tamanho menor para blocos
-          int offset = 0;
-          
-          while (offset < imageBytes.length) {
-            int end = (offset + blockSize < imageBytes.length) ? offset + blockSize : imageBytes.length;
-            List<int> chunk = imageBytes.sublist(offset, end);
-            
-            try {
-              _socket!.add(chunk);
-              // Pequena pausa para evitar sobrecarregar o socket
-              await Future.delayed(Duration(milliseconds: 100)); // Pausa maior entre blocos
-            } catch (e) {
-              print('❌ Erro ao enviar bloco de dados: $e');
-              throw e; // Re-lança a exceção para ser capturada pelo catch externo
-            }
-            
-            offset = end;
-            
-            // Atualiza status
-            if (imageBytes.length > blockSize) {
-              int percentual = (offset * 100 ~/ imageBytes.length);
-              setState(() {
-                _lastTransmissionStatus = "Enviando foto: $percentual%";
-              });
-              print('📊 Progresso: $percentual% (${offset}/${imageBytes.length} bytes)');
-            }
+
+          // 🕒 Gerar timestamp
+          String timestamp = DateTime.now().toIso8601String();
+
+          // 📨 Enviar metadados
+          await _sendCommand("STORE_PHOTO");
+          await _sendCommand("TIMESTAMP:$timestamp");
+          await _sendCommand("SIZE:${base64Image.length}");
+          await _sendCommand("HASH:$md5Hash");
+          await _sendCommand("BEGIN_DATA");
+
+          print('📝 Enviando metadados:');
+          print('STORE_PHOTO');
+          print('TIMESTAMP:$timestamp');
+          print('SIZE:${base64Image.length}');
+          print('HASH:$md5Hash');
+          print('BEGIN_DATA');
+
+          // 🔄 Envio da imagem em Base64 (em blocos)
+          int chunkSize = 1024; // Tamanho de cada bloco em bytes
+          for (int i = 0; i < base64Image.length; i += chunkSize) {
+            int end = (i + chunkSize) > base64Image.length ? base64Image.length : (i + chunkSize);
+            _socket!.write(base64Image.substring(i, end));
+            await _socket!.flush();
           }
-          
-          // Parte 3: Fechamento da transmissão
-          await Future.delayed(Duration(milliseconds: 500)); // Pausa maior antes de encerrar
-          _socket!.write("END_DATA\n");
-          
-          print('✅ Foto enviada com sucesso para armazenamento no servidor: $fileName');
+
+          await _sendCommand("END_DATA");
+          await _socket!.flush();
+
+          print('✅ Foto enviada com sucesso!');
           setState(() {
             _lastTransmissionStatus = "Foto enviada com sucesso. Aguardando confirmação...";
           });
-          
-          // A resposta de confirmação será recebida pelo _handleServerResponse
-          return; // Sucesso, sai do loop de tentativas
-          
-        } catch (socketError) {
-          print('❌ Erro de socket ao enviar foto (tentativa $tentativas): $socketError');
-          _socket = null; // Marca o socket como inválido
-          
+          return;
+
+        } catch (e) {
+          print('❌ Erro ao enviar foto (tentativa $tentativas): $e');
           if (tentativas >= maxTentativas) {
             setState(() {
-              _lastTransmissionStatus = "Erro na transmissão: $socketError";
-            });
-            
-            // Tenta reconectar após um erro
-            Future.delayed(Duration(seconds: 2), () {
-              _connectToServer();
+              _lastTransmissionStatus = "Erro ao enviar foto: $e";
             });
             return;
           }
-          
-          // Aguarda antes de tentar novamente
           await Future.delayed(Duration(seconds: 2));
-          continue; // Tenta novamente
         }
-      } catch (e) {
-        print('❌ Erro geral ao enviar foto (tentativa $tentativas): $e');
-        
-        if (tentativas >= maxTentativas) {
-          setState(() {
-            _lastTransmissionStatus = "Erro: $e";
-          });
-          return;
-        }
-        
-        // Aguarda antes de tentar novamente
-        await Future.delayed(Duration(seconds: 2));
       }
+    } catch (e) {
+      print('❌ Erro ao capturar imagem: $e');
+      setState(() {
+        _lastTransmissionStatus = "Erro ao capturar imagem";
+      });
     }
   }
+
+
+
+  Future<void> _sendCommand(String command) async {
+    _socket!.write(command + "\n");
+    await _socket!.flush();
+    print("📤 Enviado comando: $command");
+  }
+
 
   // Função para conectar ao servidor
   Future<bool> _connectToServer() async {
@@ -339,31 +301,31 @@ class _MyAppState extends State<MyApp> {
       // Já existe uma conexão ativa
       return true;
     }
-    
+
     try {
       // Define o endereço e porta do servidor
       // Altere o IP para o endereço correto do seu servidor
-      final serverIp = "192.168.1.18"; // Altere para o IP da sua máquina onde o servidor está rodando
+      final serverIp = "192.168.1.28"; // Altere para o IP da sua máquina onde o servidor está rodando
       final serverPort = 5000;
-      
+
       print("🔄 Conectando ao servidor $serverIp:$serverPort...");
-      
+
       try {
         // Configura timeout para a conexão
-        _socket = await Socket.connect(serverIp, serverPort, 
+        _socket = await Socket.connect(serverIp, serverPort,
                                       timeout: Duration(seconds: 5));
       } catch (error) {
         print("⏱️ Timeout ou erro ao conectar ao servidor: $error");
         _socket = null;
         return false;
       }
-      
+
       if (_socket == null) {
         return false;
       }
-      
+
       print("✅ Conectado ao servidor!");
-      
+
       // Configurar listener para receber respostas do servidor
       _socket!.listen(
         (List<int> data) {
@@ -384,7 +346,7 @@ class _MyAppState extends State<MyApp> {
           });
         }
       );
-      
+
       return true;
     } catch (e) {
       print("❌ Erro ao conectar ao servidor: $e");
@@ -395,25 +357,25 @@ class _MyAppState extends State<MyApp> {
       return false;
     }
   }
-  
+
   // Função para processar as respostas do servidor
   void _handleServerResponse(String response) {
     try {
       print("📥 Resposta do servidor: $response");
-      
+
       // Dividir a resposta em linhas, caso o servidor envie múltiplas mensagens
       List<String> lines = response.split('\n');
-      
+
       for (String line in lines) {
         if (line.isEmpty) continue;
-        
+
         if (line.startsWith("PHOTO_STORED:")) {
           // Extrair o nome da foto da resposta
           String fileName = line.substring("PHOTO_STORED:".length);
-          
+
           // Verificar se a foto já está na lista
           bool alreadyStored = _storedPhotos.any((photo) => photo['filename'] == fileName);
-          
+
           if (!alreadyStored) {
             setState(() {
               _storedPhotos.add({
@@ -437,11 +399,11 @@ class _MyAppState extends State<MyApp> {
           try {
             String jsonStr = line.substring("STORED_PHOTOS_LIST:".length);
             List<dynamic> photosList = jsonDecode(jsonStr);
-            
+
             setState(() {
               _storedPhotos = List<Map<String, dynamic>>.from(photosList);
             });
-            
+
             print("📋 Lista de fotos armazenadas atualizada: ${_storedPhotos.length} fotos");
           } catch (e) {
             print("❌ Erro ao processar lista de fotos: $e");
@@ -454,13 +416,13 @@ class _MyAppState extends State<MyApp> {
       print("❌ Erro ao processar resposta do servidor: $e");
     }
   }
-  
+
   // Solicita a lista de fotos armazenadas no servidor
   void _requestStoredPhotosList() async {
     if (_socket == null) {
       print('⚠️ Servidor não conectado. Tentando reconectar...');
       bool connected = await _connectToServer();
-      
+
       // Tenta novamente após reconectar se a conexão foi bem-sucedida
       if (connected) {
         Future.delayed(Duration(seconds: 1), () {
@@ -471,7 +433,7 @@ class _MyAppState extends State<MyApp> {
       }
       return;
     }
-    
+
     try {
       // Envia solicitação para o servidor
       _socket!.write("GET_STORED_PHOTOS_LIST\n");
@@ -479,7 +441,7 @@ class _MyAppState extends State<MyApp> {
     } catch (e) {
       print("❌ Erro ao solicitar lista de fotos: $e");
       _socket = null;
-      
+
       setState(() {
         _lastTransmissionStatus = "Erro ao solicitar lista de fotos";
       });
