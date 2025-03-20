@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
 
     Timer.periodic(Duration(seconds: 30), (timer) {
       if (_socket == null) {
-        print("⏱️ Tentando reconectar ao servidor...");
+        print("Tentando reconectar ao servidor...");
         _connectToServer().then((connected) {
           if (connected) {
 
@@ -67,9 +67,9 @@ class _MyAppState extends State<MyApp> {
       if (_socket != null) {
         try {
           _socket!.add(utf8.encode("PING\n"));
-          print("💓 Enviado keep-alive periódico");
+          print("Enviado keep-alive periódico");
         } catch (e) {
-          print("⚠️ Erro no keep-alive periódico: $e");
+          print("Erro no keep-alive periódico: $e");
           _socket = null;
 
         }
@@ -445,7 +445,7 @@ class _MyAppState extends State<MyApp> {
         
         for (int serverPort in possiblePorts) {
           try {
-            print("🔄 Tentando conectar ao servidor $serverIp:$serverPort...");
+            print("Tentando conectar ao servidor $serverIp:$serverPort...");
 
             _socket = await Socket.connect(
               serverIp, 
@@ -454,7 +454,7 @@ class _MyAppState extends State<MyApp> {
             );
             
             if (_socket != null) {
-              print("✅ Conectado ao servidor em $serverIp:$serverPort!");
+              print("Conectado ao servidor em $serverIp:$serverPort!");
               connected = true;
 
               _socket!.add(utf8.encode("HELLO\n"));
@@ -487,7 +487,7 @@ class _MyAppState extends State<MyApp> {
               break;
             }
           } catch (error) {
-            print("⚠️ Não foi possível conectar a $serverIp:$serverPort - $error");
+            print("Não foi possível conectar a $serverIp:$serverPort - $error");
             _socket = null;
           }
         }
@@ -593,7 +593,7 @@ class _MyAppState extends State<MyApp> {
       await _socket!.flush();
       return true;
     } catch (e) {
-      print("❌ Erro ao enviar comando '$command': $e");
+      print("Erro ao enviar comando '$command': $e");
 
       _socket = null;
       return false;
