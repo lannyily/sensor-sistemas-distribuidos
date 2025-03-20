@@ -430,7 +430,7 @@ class _MyAppState extends State<MyApp> {
 
 
       final List<String> possibleIps = [
-        "192.168.1.28",    // IP original
+        "192.168.1.18",    // IP original
         "localhost",       // Nome simbólico
         "127.0.0.1",       // localhost numérico
         //"10.0.2.2",        // Emulador Android -> localhost

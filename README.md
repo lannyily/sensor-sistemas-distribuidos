@@ -97,11 +97,11 @@ final List<String> possibleIps = [
 
 O aplicativo possui uma tela inicial com um botão para ativar e desativar o sensor de proximidade. Quando ativado, o sensor detecta movimento e captura uma foto automaticamente. Esse processo ocorre de forma independente, sem necessidade de conexão com o servidor.
 
-[ FOTO ]
+![Tela Inicia](tela_inicial.jpg)
 
 Na parte superior do aplicativo, há um botão para estabelecer conexão com o servidor, caso ainda não esteja conectada. A foto capturada só é enviada ao servidor se a conexão estiver ativa.
 
-[ FOTO ]
+![Botão Reconectar](botão_reconectar.jpg)
 
 Quando o servidor detecta movimento, ele ativa um alarme, que só pode ser desligado manualmente na interface do servidor. Essa interface contém:
 
@@ -111,4 +111,5 @@ Quando o servidor detecta movimento, ele ativa um alarme, que só pode ser desli
   
 As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos" do servidor.
 
-[ FOTO ]
+![Foto Salvo](foto_armazenada_servidor.png)
+![Servidor Fotos](servidor_fotos.jpg)
