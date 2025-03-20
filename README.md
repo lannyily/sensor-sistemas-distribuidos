@@ -16,13 +16,13 @@ Este projeto é um plicativo Android que utilize o sensor de proximidade para at
 
 **Aplicativo:** 
 
-- proximity_sensor – Para detectar proximidade do dispositivo.
-- camera – Para acessar a câmera do dispositivo.
-- path_provider – Para obter diretórios do sistema, como armazenamento temporário e permanente.
-- path – Para manipular caminhos de arquivos de forma cross-platform.
-- permission_handler – Para gerenciar permissões do sistema, como câmera e armazenamento.
-- crypto – Para criptografia e hashing de dados (MD5, SHA-256, etc.).
-- flutter/services.dart – Para comunicação com serviços nativos do sistema operacional.
+- proximity_sensor: Para detectar proximidade do dispositivo.
+- camera: Para acessar a câmera do dispositivo.
+- path_provider: Para obter diretórios do sistema, como armazenamento temporário e permanente.
+- path: Para manipular caminhos de arquivos de forma cross-platform.
+- permission_handler: Para gerenciar permissões do sistema, como câmera e armazenamento.
+- crypto: Para criptografia e hashing de dados (MD5, SHA-256, etc.).
+- flutter/services.dart: Para comunicação com serviços nativos do sistema operacional.
 
 **Servidor:**
 
