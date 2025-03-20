@@ -50,8 +50,6 @@ O **Python 3.11.6** foi escolhido porque versões mais recentes, como o **Python
 🔹 Baixe e instale o Python 3.11.6 no link abaixo:  
 [🔗 Download Python 3.11.6](https://www.python.org/downloads/release/python-3116/)  
 
----  
-
 ### 2️⃣ Clonar o Repositório  
 
 Para obter o código do projeto, clone o repositório com:  
@@ -59,8 +57,6 @@ Para obter o código do projeto, clone o repositório com:
 ```sh
 git clone git@github.com:lannyily/sensor-sistemas-distribuidos.git
 ```  
-
----  
 
 ### 3️⃣ Instalar as Bibliotecas  
 
@@ -70,13 +66,9 @@ Após clonar o projeto, instale todas as dependências necessárias executando:
 pip install -r requirements.txt
 ```  
 
----  
-
 ### 4️⃣ Configurar o Emulador ou um Dispositivo Real  
 
 Para testar o aplicativo, utilize um **emulador Android** ou um **dispositivo físico** com modo desenvolvedor ativado.  
-
----  
 
 ### 5️⃣ Configurar o Endereço IP  
 
