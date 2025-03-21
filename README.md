@@ -129,8 +129,10 @@ Quando o servidor detecta movimento, ele ativa um alarme, que só pode ser desli
 
 As fotos capturadas pelo aplicativo são enviadas e armazenadas na pasta "fotos" do servidor.
 
-<img src="foto_armazenada_servidor.png" alt="Foto Salvo" width="250">
-<img src="servidor_fotos.jpg" alt="Servidor Fotos" width="500">
+<div style="display: flex; gap: 10px;">
+  <img src="foto_armazenada_servidor.png" alt="Foto Salvo" width="250">
+  <img src="servidor_fotos.jpg" alt="Servidor Fotos" width="500">
+</div>
 
 # 🗂️ Estrutura do Projeto
 
